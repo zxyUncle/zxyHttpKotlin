@@ -1,0 +1,17 @@
+<resources>
+
+    <string name="app_name">ZXYHttp</string>
+    <string name="refresh_header_loading">加载中...</string>
+    <string name="refresh_header_nonetword">网路请求失败，请检查你的网路设置</string>
+    <string name="include_network_no">无网路</string>
+    <string name="include_empty">无内容</string>
+    <string name="noPermission">请联系开发人员，添加你的权限</string>
+
+    <string name="yn_noclick">未设置点击事件</string>
+    <string name="yn_loading">加载中...</string>
+    <string name="yn_init_error">YN未初始化或没有访问权限</string>
+    <string name="yn_extends">当前Activity必须继承FragmentActivity</string>
+
+
+
+</resources>
