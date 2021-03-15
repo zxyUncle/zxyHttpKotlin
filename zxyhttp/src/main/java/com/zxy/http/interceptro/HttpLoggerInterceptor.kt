@@ -30,8 +30,10 @@ class HttpLoggerInterceptor(mContext: RxAppCompatActivity) : Interceptor {
                 requestBody!!.writeTo(buffer)
                 var charset = Charset.forName("UTF-8")
                 val contentType = requestBody.contentType()
-                charset = contentType!!.charset(Charset.forName("UTF-8"))
-                body = buffer.readString(charset)
+                if (contentType != null) {
+                    charset = contentType!!.charset(Charset.forName("UTF-8"))
+                    body = buffer.readString(charset)
+                }
                 LogcatUitls.printPost(OkHttpConfig.HTTP_TAG, request.url().toString(), body)
             } else {
                 LogcatUitls.printStirng(OkHttpConfig.HTTP_TAG, request.url().toString())
