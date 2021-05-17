@@ -13,11 +13,12 @@ import kotlinx.android.parcel.Parcelize
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class ArticleData(
-    var courseId: Int? = null, // 13
-    var id: Int? = null, // 434
-    var name: String? = null, // Gityuan
-    var order: Int? = null, // 190013
-    var parentChapterId: Int? = null, // 407
-    var userControlSetTop: Boolean? = null, // false
-    var visible: Int? = null // 1
+    var children: List<String> = listOf(),
+    var courseId: Int? = 0, // 13
+    var id: Int? = 0, // 409
+    var name: String? = "", // 郭霖
+    var order: Int? = 0, // 190001
+    var parentChapterId: Int? = 0, // 407
+    var userControlSetTop: Boolean? = false, // false
+    var visible: Int? = 0 // 1
 ) : Parcelable

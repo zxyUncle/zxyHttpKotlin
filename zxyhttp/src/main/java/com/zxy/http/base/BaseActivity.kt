@@ -12,9 +12,7 @@ import com.zxy.http.OkHttpService
  * ******************************************
  */
 open class BaseActivity:RxAppCompatActivity() {
-    lateinit var okHttpApi: OkHttpApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        okHttpApi = OkHttpService.INSTANCE.apiService(this)
     }
 }

@@ -1,7 +1,8 @@
+@file:Suppress("DEPRECATED_IDENTITY_EQUALS")
+
 package com.zxy.http
 
 import android.annotation.SuppressLint
-import android.content.Context
 import com.google.gson.Gson
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
@@ -11,6 +12,7 @@ import com.zxy.http.interceptro.HeaderInterceptoer
 import com.zxy.http.interceptro.HttpLoggerInterceptor
 import com.zxy.http.tools.LogcatUitls
 import com.zxy.http.tools.NetWorkListener
+import com.zxy.http.tools.hideLoad
 import com.zxy.http.utils.*
 import com.zxy.httpnet.utils.NetWorkUtils
 import io.reactivex.Observable
@@ -18,6 +20,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.*
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -33,14 +38,8 @@ import java.util.concurrent.TimeUnit
  * *********************************************************
  */
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-open class OkHttpService {
+object OkHttpService {
     private lateinit var mContext: RxAppCompatActivity
-
-    companion object {
-        val INSTANCE: OkHttpService by lazy(mode = LazyThreadSafetyMode.SYNCHRONIZED) {
-            OkHttpService()
-        }
-    }
 
     fun apiService(mContext: RxAppCompatActivity): OkHttpApi {
         this.mContext = mContext
@@ -67,24 +66,21 @@ open class OkHttpService {
         return retrofit.create(service)
     }
 
-    /**
-     * 显示Dialog 加载中动画的网路
-     *
-     * @param observable         Observable<T>
-     * @param httpClickLenerlist HttpClickLenerlist<T>
-     *     ,httpClickLenerlist: NetWorkListener<T>
-     */
     @SuppressLint("CheckResult")
-    open fun <T> callBack(
-        observable: Observable<BaseBean<T>>,
-        onSucc:(BaseBean<T>.() -> Unit) = {},
-        onFail: (BaseBean<T>.() -> Unit) = {},
-        onNetWorkError: (Throwable?.() -> Unit) = {}
+    @JvmStatic
+    open fun <T> request(
+        reqeustApi: () -> Observable<BaseBean<T>>,
+        onSucc: BaseBean<T>.() -> Unit,
+        onFail: BaseBean<T>.() -> Unit,
+        onNetWorkError: () -> Unit = {},
+        isHideLoading: Boolean = true,
     ) {
         if (!NetWorkUtils.isNetAvailable(mContext)) {
-            onNetWorkError(null)
+            GlobalScope.launch(Dispatchers.Main) {
+                onNetWorkError()
+            }
         } else {
-            observable.subscribeOn(Schedulers.io())
+            reqeustApi().subscribeOn(Schedulers.io())
                 .compose(mContext.bindUntilEvent(ActivityEvent.DESTROY))
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ baseBean ->  //请求的next对象
@@ -101,9 +97,11 @@ open class OkHttpService {
                 }, { throwable: Throwable ->  //error
                     //加载动画隐藏
                     LogcatUitls.printJson(OkHttpConfig.HTTP_TAG, Gson().toJson(throwable))
-                    onNetWorkError(throwable)
+                    var baseBean = BaseBean<T>()
+                    onFail(baseBean)
                 }, {
-
+                   if(isHideLoading)
+                       hideLoad()
                 })
         }
     }

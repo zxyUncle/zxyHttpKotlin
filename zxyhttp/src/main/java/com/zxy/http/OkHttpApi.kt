@@ -6,6 +6,7 @@ import io.reactivex.Observable
 import okhttp3.RequestBody
 import retrofit2.http.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by ZXY on 2019/9/5 11:52.
@@ -20,7 +21,7 @@ interface OkHttpApi {
      * 获取公众号列表
      */
     @GET("wxarticle/chapters/json")
-    fun getWXArticle(): Observable<BaseBean<ArticleData>>
+    fun getWXArticle(): Observable<BaseBean<ArrayList<ArticleData>>>
 
 
 }
